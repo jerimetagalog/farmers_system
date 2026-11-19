@@ -72,7 +72,7 @@ require_once __DIR__ . '/php/header.php';
 
     <section style="margin-bottom: 24px;">
         <h3 style="color: var(--primary-dark); font-size: 16px; margin-bottom: 8px;">4. Contact the Data Protection Officer</h3>
-        <p>For inquiries regarding your rights under the Data Privacy Act (access, correction, or erasure), contact the Agricultural Data Officer at: <a href="mailto:efren.castillano@csucc.edu.ph">efren.castillano@csucc.edu.ph</a>.</p>
+        <p>For inquiries regarding your rights under the Data Privacy Act (access, correction, or erasure), contact the Agricultural Data Officer at: <a href="mailto:jerime.tagalog@csucc.edu.ph">jerime.tagalog@csucc.edu.ph</a>.</p>
     </section>
 
     <div style="text-align: center; margin-top: 30px; border-top: 1px solid var(--border); padding-top: 18px;">

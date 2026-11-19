@@ -32,9 +32,9 @@ INSERT INTO `users` (
     `role`, `is_verified`, `failed_logins`, `lockout_tier`, `locked_until`, `privacy_consent_at`, `created_at`, `updated_at`
 ) VALUES
 (
-    '2020-1050', 'Efren', 'V', 'Castillano', NULL,
+    '2020-1050', 'Jerime', NULL, 'Tagalog', NULL,
     '1998-05-12', 28, 'Purok 4', 'Ampayon', 'Butuan City', 'Agusan del Norte', 'Philippines', '8600',
-    'efren.castillano@csucc.edu.ph', 'admin_officer',
+    'jerime.tagalog@csucc.edu.ph', 'admin_officer',
     '$2y$10$wYd22L6DS5tBxeI4sqZ2OuUv.LsfW1HEyqSRUrH.oXUEtvvxb.CgO',
     'AzNsJtCdz5HdrvIREXXmbuORCjpAE1Pmz+hQqJZJ0FE=',
     'Commercial Farmer', 'Rice', NULL,
@@ -43,7 +43,7 @@ INSERT INTO `users` (
 (
     '2020-1051', 'Juan', 'Dela', 'Cruz', NULL,
     '1985-08-20', 41, 'Purok 2 Green Valley', 'Los Angeles', 'Butuan City', 'Agusan del Norte', 'Philippines', '8600',
-    'efren.castillano+juan@csucc.edu.ph', 'farmer_juan',
+    'jerime.tagalog+juan@csucc.edu.ph', 'farmer_juan',
     '$2y$10$sXx4NxMfGnkGLKoOsjJpneD2GmHeCRHh6j2/LoDdHv6lRqU/Ojlai',
     '0M902eJrITdk69lgg0rue4IRwkTgNvvimqHDNjGYWd8=',
     'Smallholder Farmer', 'Rice', NULL,
@@ -52,7 +52,7 @@ INSERT INTO `users` (
 (
     '2020-1052', 'Maria', 'Santos', 'Reyes', NULL,
     '1990-11-14', 36, 'Purok 5 Riverside', 'Baan', 'Butuan City', 'Agusan del Norte', 'Philippines', '8600',
-    'efren.castillano+maria@csucc.edu.ph', 'farmer_maria',
+    'jerime.tagalog+maria@csucc.edu.ph', 'farmer_maria',
     '$2y$10$sXx4NxMfGnkGLKoOsjJpneD2GmHeCRHh6j2/LoDdHv6lRqU/Ojlai',
     'lDAPKstN5QZRcNti8qJeSTNekmHHYy1ziIb6pAnGYvs=',
     'Tenant Farmer', 'Corn', NULL,
