@@ -78,8 +78,8 @@ Open your web browser and navigate to:
 | Role | Username | Password | Purpose |
 | :--- | :--- | :--- | :--- |
 | **Administrator** | `admin_monitor` | `Admin@2026!` | Access Security Monitoring Dashboard (`admin_dashboard.php`) |
-| **Farmer 1** | `farmer_juan` | `Farmer@2026!` | Submit and view farm assistance requests (`farm_requests.php`) |
-| **Farmer 2** | `farmer_maria` | `Farmer@2026!` | Test lockouts, password history, and OTP verification |
+| **Farmer 1** | `farmer_juan` | `JuanFarmer2026!` | Submit and view farm assistance requests (`assistance.php`) |
+| **Farmer 2** | `farmer_maria` | `MariaFarmer2026!` | Test lockouts, password history, and OTP verification |
 
 ---
 

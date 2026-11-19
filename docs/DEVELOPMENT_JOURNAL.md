@@ -110,7 +110,7 @@ The goal for Week 3 was implementing a resilient 2-step authentication flow, def
 The final week focused on completing farmer assistance request management, developing the administrator security monitoring dashboard, writing the CLI security monitor, conducting automated testing, and producing project documentation.
 
 ### 2. Work Completed
-- **Farmer Assistance Request Portal (`farm_requests.php`):**
+- **Farmer Assistance Request Portal (`assistance.php`):**
   - Built assistance request interface with support category routing (fertilizer subsidies, seed provision, crop protection, equipment loans, soil advisory).
   - Enforced strict authorization: farmers can only select and view their own requests (`WHERE farmer_id = :uid`).
   - Decrypted contact numbers at runtime using AES-256 for authorized display.

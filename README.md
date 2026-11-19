@@ -213,9 +213,9 @@ This script scans for:
 
 | Username | Password | Role | Description |
 | :--- | :--- | :--- | :--- |
-| `admin_monitor` | `AdminPassword123!` | Administrator | Accesses `admin_dashboard.php` and reviews security flags and logs. |
-| `farmer_juan` | `JuanPassword123!` | Farmer | Submits assistance requests, tracks application statuses on `assistance.php`. |
-| `farmer_maria` | `MariaPassword123!` | Farmer | Used for demonstrating Forgot Password, Security Questions, and OTP recovery. |
+| `admin_monitor` | `Admin@2026!` | Administrator | Accesses `admin_dashboard.php` and reviews security flags and logs. |
+| `farmer_juan` | `JuanFarmer2026!` | Farmer | Submits assistance requests, tracks application statuses on `assistance.php`. |
+| `farmer_maria` | `MariaFarmer2026!` | Farmer | Used for demonstrating Forgot Password, Security Questions, and OTP recovery. |
 
 *Detailed scenario-by-scenario presentation steps are provided in [`docs/SYSTEM_USER_GUIDE.md`](docs/SYSTEM_USER_GUIDE.md).*
 
