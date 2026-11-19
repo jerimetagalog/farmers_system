@@ -2,6 +2,7 @@
 **Course:** IT 107 – Information Assurance and Security 1  
 **Project:** Secure Farmers Registration, Assistance and Monitoring System  
 **Student:** Jerime Tagalog (`jerime.tagalog@csucc.edu.ph`)  
+**Student ID:** 2020-1050  
 **Security Settings:** Universal Section 2.3 Settings (MinUser:6, MaxUser:20, MinPwd:8, MaxName:50)
 
 ---
