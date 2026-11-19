@@ -1,79 +1,83 @@
 <?php
 /**
- * Privacy Notice under the Philippine Data Privacy Act of 2012 (RA 10173)
+ * Data Privacy Notice (RA 10173 - Philippine Data Privacy Act of 2012)
  * IT 107 - Information Assurance and Security 1
- * Implements Handout Section 4.3 & Grading Criterion F2 / P5
+ * Implements Protection S8 & Handout Section 4.3
+ * System: Secure Farmers Registration, Assistance and Monitoring System
+ * Student ID: 2020-1050
  */
 
-$pageTitle = 'Privacy Notice';
+$pageTitle = 'Privacy Notice (RA 10173)';
 require_once __DIR__ . '/php/header.php';
 ?>
 
-<div class="card">
-    <h1 class="card-title" style="font-size: 24px; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">
-        Privacy Notice &amp; Consent Statement
+<div class="card" style="max-width: 860px; margin: 20px auto; line-height: 1.8;">
+    <h1 class="card-title" style="border-bottom: 2px solid var(--border); padding-bottom: 12px; margin-bottom: 18px;">
+        &#128220; Data Privacy Notice &amp; Consent
     </h1>
-    <p class="card-subtitle">In compliance with Republic Act No. 10173 (Data Privacy Act of 2012 of the Philippines)</p>
+    <p class="field-hint" style="margin-bottom: 20px;">
+        In compliance with the <strong>Philippine Data Privacy Act of 2012 (Republic Act No. 10173)</strong>, its Implementing Rules and Regulations, and National Privacy Commission guidelines.
+    </p>
 
-    <div style="font-size: 14px; line-height: 1.7; color: var(--secondary);">
-        <h3 style="color: var(--primary); margin: 18px 0 6px 0;">1. Purpose and Scope</h3>
-        <p>The <strong>Secure Clinic Appointment and Monitoring System</strong> collects and processes personal information for the exclusive purpose of scheduling, managing, and facilitating medical consultations at the Caraga State University Clinic.</p>
+    <section style="margin-bottom: 24px;">
+        <h3 style="color: var(--primary-dark); font-size: 16px; margin-bottom: 8px;">1. Purpose of Data Processing</h3>
+        <p>The <strong>Secure Farmers Registration, Assistance and Monitoring System</strong> collects and processes personal information for the exclusive purpose of evaluating, managing, and distributing agricultural subsidies, farm equipment support, and agronomy advisory services under the Department of Agriculture and Caraga State University research extensions.</p>
+    </section>
 
-        <h3 style="color: var(--primary); margin: 18px 0 6px 0;">2. Information We Collect and Why</h3>
-        <table class="data-table">
+    <section style="margin-bottom: 24px;">
+        <h3 style="color: var(--primary-dark); font-size: 16px; margin-bottom: 8px;">2. Personal and Sensitive Data Collected</h3>
+        <table class="data-table" style="margin-top: 10px;">
             <thead>
                 <tr>
-                    <th style="width: 25%;">Data Category</th>
-                    <th style="width: 30%;">Fields Collected</th>
-                    <th>Reason for Collection &amp; Protection Applied</th>
+                    <th style="width: 28%;">Data Element</th>
+                    <th>Legal Basis &amp; Protection Standard</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>Identity Data</strong></td>
-                    <td>ID Number, Full Name, Birthdate, Age</td>
-                    <td>Required to establish unique patient identity, verify adult consent (must be &ge; 18 years old), and link clinical consultation records accurately.</td>
+                    <td><strong>Full Name, Birthdate &amp; Age</strong></td>
+                    <td>Required to establish unique farmer identity, verify legal adult consent (must be &ge; 18 years old), and link agricultural support records.</td>
                 </tr>
                 <tr>
-                    <td><strong>Address Data</strong></td>
-                    <td>Purok/Street, Barangay, City, Province, Country, ZIP</td>
-                    <td>Necessary for patient geographical profiling, local health monitoring, and emergency health responses.</td>
+                    <td><strong>Permanent Farm &amp; Residential Address</strong></td>
+                    <td>Ensures accurate geolocation of farm parcels for crop assistance, soil sampling, and municipal subsidy eligibility.</td>
                 </tr>
                 <tr>
-                    <td><strong>Contact Information</strong></td>
-                    <td>Email Address, Contact Number, Emergency Contact</td>
-                    <td>Used for two-step authentication OTP dispatch, consultation updates, and emergency medical notification. <strong>Patient contact numbers are encrypted at rest using AES-256 (Protection 13).</strong></td>
+                    <td><strong>Contact Mobile Number</strong></td>
+                    <td><strong>Sensitive Field:</strong> Encrypted at rest in the database using <strong>AES-256</strong> (Protection 13). Plaintext is never exposed in raw database storage. Decrypted only when displayed to the authenticated farmer or authorized agricultural officers.</td>
                 </tr>
                 <tr>
-                    <td><strong>Authentication &amp; Security</strong></td>
-                    <td>Password, Security Question Answers (Q2, Q5, Q7)</td>
-                    <td>Used exclusively to authenticate identity and authorize self-service password recovery. <strong>Stored strictly as one-way cryptographic hashes. Never stored in plaintext.</strong></td>
+                    <td><strong>Farmer Classification &amp; Crop Commodity</strong></td>
+                    <td>Used exclusively to allocate appropriate seed varieties, fertilizers, and agricultural equipment assistance.</td>
                 </tr>
                 <tr>
-                    <td><strong>Audit &amp; Access Logs</strong></td>
-                    <td>IP Address, Browser User Agent, Timestamps</td>
-                    <td>Maintained in an append-only security log to detect credential guessing, automated attacks, and protect clinic record integrity (Section 13.4).</td>
+                    <td><strong>Authentication Audit Logs</strong></td>
+                    <td>Maintained in an append-only security log to detect credential guessing, automated attacks, and protect registry integrity (Section 13.4).</td>
                 </tr>
             </tbody>
         </table>
+    </section>
 
-        <h3 style="color: var(--primary); margin: 18px 0 6px 0;">3. Security Safeguards Applied</h3>
-        <ul style="margin-left: 24px;">
-            <li><strong>AES-256 Symmetric Encryption:</strong> Patient contact numbers are encrypted at rest with a securely generated IV.</li>
-            <li><strong>Cryptographic Hashing:</strong> Passwords, security answers, and OTP codes are hashed with PHP <code>password_hash()</code>.</li>
-            <li><strong>Access Control:</strong> Patients can access only their own appointment records. Administrative pages are restricted by server authorization.</li>
-            <li><strong>Automated Monitoring:</strong> The system logs security events and detects brute-force patterns, account targeting, and off-hours activity.</li>
+    <section style="margin-bottom: 24px;">
+        <h3 style="color: var(--primary-dark); font-size: 16px; margin-bottom: 8px;">3. Data Subject Rights (RA 10173 Section 16)</h3>
+        <p>As a registered farmer, you are entitled to the following rights under RA 10173:</p>
+        <ul style="margin-left: 24px; margin-top: 8px;">
+            <li><strong>Right to be Informed:</strong> To know that your personal data is collected and processed.</li>
+            <li><strong>Right to Access:</strong> To view your profile, contact details, and submitted farm assistance requests upon login.</li>
+            <li><strong>Right to Rectification:</strong> To correct inaccurate information through official administrative channels.</li>
+            <li><strong>Right to Erasure / Blocking:</strong> To request account deactivation subject to statutory retention requirements.</li>
+            <li><strong>Right to Damages:</strong> To be indemnified for damages due to unlawful data processing.</li>
         </ul>
+    </section>
 
-        <h3 style="color: var(--primary); margin: 18px 0 6px 0;">4. Retention Period</h3>
-        <p>Personal and medical appointment data are retained for the duration of the student or staff member's affiliation with Caraga State University, in accordance with the National Archives of the Philippines Act and University Health Services guidelines.</p>
+    <section style="margin-bottom: 24px;">
+        <h3 style="color: var(--primary-dark); font-size: 16px; margin-bottom: 8px;">4. Contact the Data Protection Officer</h3>
+        <p>For inquiries regarding your rights under the Data Privacy Act (access, correction, or erasure), contact the Agricultural Data Officer at: <a href="mailto:efren.castillano@csucc.edu.ph">efren.castillano@csucc.edu.ph</a>.</p>
+    </section>
 
-        <h3 style="color: var(--primary); margin: 18px 0 6px 0;">5. Data Protection Officer Contact</h3>
-        <p>For inquiries regarding your rights under the Data Privacy Act (access, correction, or erasure), contact the Clinic Data Officer at: <a href="mailto:efren.castillano@csucc.edu.ph">efren.castillano@csucc.edu.ph</a>.</p>
-    </div>
-
-    <div style="margin-top: 24px; text-align: center;">
-        <a href="register.php" class="btn btn-primary">&#8592; Back to Patient Registration</a>
+    <div style="text-align: center; margin-top: 30px; border-top: 1px solid var(--border); padding-top: 18px;">
+        <a href="register.php" class="btn btn-primary">&#8592; Return to Registration</a>
+        <a href="index.php" class="btn btn-secondary" style="margin-left: 10px;">Return to Home</a>
     </div>
 </div>
 

@@ -2,7 +2,8 @@
 setlocal enabledelayedexpansion
 
 echo =====================================================================
-echo  IT 107 IAS 1 Final Project: Clinic Appointment and Monitoring System
+echo  IT 107 IAS 1: Secure Farmers Registration, Assistance & Monitoring
+echo  Assigned Student ID: 2020-1050
 echo  One-Click Automated Setup and Database Import Script
 echo =====================================================================
 echo.
@@ -32,8 +33,6 @@ if not exist "config.php" (
     if exist "config.sample.php" (
         copy "config.sample.php" "config.php" >nul
         echo [INFO] Created 'config.php' from 'config.sample.php'.
-    ) else (
-        echo [WARNING] Neither config.php nor config.sample.php was found.
     )
 ) else (
     echo [OK] config.php is ready.
@@ -50,35 +49,32 @@ if not exist "logs" (
 
 :: 4. Import database
 echo [3/3] Importing database into MySQL...
-echo Attempting database import using root user...
-
 set "SQL_FILE=database\full_database_dump.sql"
 if not exist "!SQL_FILE!" (
     set "SQL_FILE=database\schema.sql"
 )
 
-echo Importing !SQL_FILE!...
-"%MYSQL_PATH%" -u root -e "CREATE DATABASE IF NOT EXISTS clinic_appointment_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+"%MYSQL_PATH%" -u root -e "CREATE DATABASE IF NOT EXISTS farmers_system_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 if !errorlevel! neq 0 (
-    echo [WARNING] Direct login with empty password failed. If your root has a password, enter it when prompted:
-    "%MYSQL_PATH%" -u root -p -e "CREATE DATABASE IF NOT EXISTS clinic_appointment_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-    "%MYSQL_PATH%" -u root -p clinic_appointment_db < "!SQL_FILE!"
+    echo [WARNING] Direct login with empty password failed. If root has a password, enter when prompted:
+    "%MYSQL_PATH%" -u root -p -e "CREATE DATABASE IF NOT EXISTS farmers_system_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+    "%MYSQL_PATH%" -u root -p farmers_system_db < "!SQL_FILE!"
 ) else (
-    "%MYSQL_PATH%" -u root clinic_appointment_db < "!SQL_FILE!"
+    "%MYSQL_PATH%" -u root farmers_system_db < "!SQL_FILE!"
 )
 
 if !errorlevel! equ 0 (
     echo.
     echo =====================================================================
-    echo [SUCCESS] Setup completed successfully!
+    echo [SUCCESS] Farmers System Setup completed successfully!
     echo.
     echo Available Pre-Seeded Accounts:
-    echo   1. Administrator:  admin_monitor  /  Admin@2026!
-    echo   2. Patient Juan:   patient_juan   /  Patient@2026!
-    echo   3. Patient Maria:  patient_maria  /  Patient@2026!
+    echo   1. Administrator:  admin_officer  /  Admin@2026!  (ID: 2020-1050)
+    echo   2. Farmer Juan:    farmer_juan    /  Farmer@2026! (ID: 2020-1051)
+    echo   3. Farmer Maria:   farmer_maria   /  Farmer@2026! (ID: 2020-1052)
     echo.
     echo Open in your browser:
-    echo   http://localhost/clinic_appoinment_system
+    echo   http://localhost/farmers_system
     echo =====================================================================
 ) else (
     echo.

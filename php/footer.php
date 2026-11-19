@@ -1,7 +1,7 @@
     </div><!-- /.container -->
 </main><!-- /.main-content -->
 
-<!-- IDLE SESSION TIMEOUT WARNING MODAL (Handout Section 8.4: 9 min timeout, warn 1 min before) -->
+<!-- IDLE SESSION TIMEOUT WARNING MODAL (Handout Section 8.4: 15 min timeout, warn 1 min before) -->
 <?php if (isset($_SESSION['user_id'])): ?>
 <div id="idle-warning-modal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
@@ -19,10 +19,10 @@
 <!-- MAIN FOOTER (Handout Section 3.1: Footer holds copyright statement) -->
 <footer class="main-footer">
     <div class="container footer-inner">
-        <p class="copyright">&copy; 2026 Efren Castillano. All rights reserved.</p>
+        <p class="copyright">&copy; 2026 Efren Castillano (Student ID: 2020-1050). All rights reserved.</p>
         <p class="footer-links">
             <a href="privacy_notice.php">Privacy Notice (RA 10173)</a> &middot;
-            <span>Caraga State University &middot; BS Information Technology</span>
+            <span>Department of Agriculture Region XIII &middot; Caraga State University</span>
         </p>
     </div>
 </footer>

@@ -1,8 +1,8 @@
 # DESIGN DECISIONS
 **Course:** IT 107 – Information Assurance and Security 1  
-**Project:** Secure Clinic Appointment and Monitoring System  
-**Student:** Efren Castillano (`efren.castillano@csucc.edu.ph`)  
-**Assigned Seed:** $D_1 = 9$, $D_2 = 1$
+**Project:** Secure Farmers Registration, Assistance and Monitoring System  
+**Student:** Jerime Tagalog (`jerime.tagalog@csucc.edu.ph`)  
+**Security Settings:** Universal Section 2.3 Settings (MinUser:6, MaxUser:20, MinPwd:8, MaxName:50)
 
 ---
 
@@ -12,7 +12,7 @@ We chose PHP's native `PASSWORD_DEFAULT` implementation, utilizing **Bcrypt** wi
 ---
 
 ### Decision 2: Password Strength Evaluation Rules (Section 4.9)
-Our password strength policy classifies passwords into **Weak**, **Medium**, and **Strong** based on entropy, length, and character diversity. A password is rated **Weak** if it is under the seeded minimum of 9 characters or fails to combine multiple character sets; weak passwords are programmatically rejected from form submission. A password is rated **Medium** if it meets the minimum 9-character threshold and contains at least two distinct character types (lowercase, uppercase, numbers, or symbols). A password achieves **Strong** status if it contains at least 12 characters and integrates uppercase letters, lowercase letters, numeric digits, and special symbols. This ensures high Shannon entropy and resistance against automated rainbow table lookups.
+Our password strength policy classifies passwords into **Weak**, **Medium**, and **Strong** based on entropy, length, and character diversity. A password is rated **Weak** if it is under the Universal minimum of 8 characters or fails to combine multiple character sets; weak passwords are programmatically rejected from form submission. A password is rated **Medium** if it meets the minimum 8-character threshold and contains at least two distinct character types (lowercase, uppercase, numbers, or symbols). A password achieves **Strong** status if it contains at least 12 characters and integrates uppercase letters, lowercase letters, numeric digits, and special symbols. This ensures high Shannon entropy and resistance against automated rainbow table lookups.
 
 ---
 
@@ -22,12 +22,12 @@ Security question answers constitute secondary authentication credentials equiva
 ---
 
 ### Decision 4: Does a Failed CAPTCHA Count as a Failed Log-in? (Section 7.1)
-We decided that a failed CAPTCHA **does not** count toward the account-specific lockout failure counter, but **does** record an entry in the IP-level failure monitoring and activity log (`CAPTCHA_FAILED`). The reasoning is that CAPTCHA serves specifically as bot mitigation (proof of human presence) rather than proof of identity. If failed CAPTCHAs counted directly toward a user's account lockout, an automated adversary could easily launch a targeted Denial of Service (Account Lockout DoS) attack against innocent medical personnel or patients by submitting arbitrary CAPTCHA guesses with the victim's known username, locking their account indefinitely without ever guessing a password.
+We decided that a failed CAPTCHA **does not** count toward the account-specific lockout failure counter, but **does** record an entry in the IP-level failure monitoring and activity log (`CAPTCHA_FAILED`). The reasoning is that CAPTCHA serves specifically as bot mitigation (proof of human presence) rather than proof of identity. If failed CAPTCHAs counted directly toward a user's account lockout, an automated adversary could easily launch a targeted Denial of Service (Account Lockout DoS) attack against innocent agricultural officers or farmers by submitting arbitrary CAPTCHA guesses with the victim's known username, locking their account indefinitely without ever guessing a password.
 
 ---
 
 ### Decision 5: Is "Disabling the Back Button" Enough? (Section 8.4)
-Disabling or manipulating the browser back button via client-side JavaScript (`history.pushState` or `window.onunload`) is cosmetic and provides zero cryptographic or server-side security. An attacker with physical access or browser inspect tools can simply review cached DOM pages or inspect network response dumps if the server does not instruct the browser to discard the content. Real protection is accomplished through two server-enforced countermeasures: first, terminating the session entirely on the server upon logout; second, issuing strict HTTP cache control headers (`Cache-Control: no-store, no-cache, must-revalidate, max-age=0` and `Pragma: no-cache`) on every protected page so the browser never stores sensitive clinic consultation records in its local disk or memory cache.
+Disabling or manipulating the browser back button via client-side JavaScript (`history.pushState` or `window.onunload`) is cosmetic and provides zero cryptographic or server-side security. An attacker with physical access or browser inspect tools can simply review cached DOM pages or inspect network response dumps if the server does not instruct the browser to discard the content. Real protection is accomplished through two server-enforced countermeasures: first, terminating the session entirely on the server upon logout; second, issuing strict HTTP cache control headers (`Cache-Control: no-store, no-cache, must-revalidate, max-age=0` and `Pragma: no-cache`) on every protected page so the browser never stores sensitive farmer registration records in its local disk or memory cache.
 
 ---
 
@@ -37,12 +37,12 @@ To prevent unauthorized direct access to `change_password.php`, the system enfor
 ---
 
 ### Decision 7: Protecting the Log Table Itself from Deletion (Section 13.3)
-In an enterprise production deployment, the database user account utilized by the web application should possess strictly **`SELECT` and `INSERT` privileges only** on the `activity_logs` table, with all `UPDATE`, `DELETE`, `DROP`, and `ALTER` grants revoked at the MySQL user permission level (`REVOKE DELETE, UPDATE ON clinic_appointment_db.activity_logs FROM 'clinic_app'@'localhost'`). In our application codebase, there are zero `UPDATE` or `DELETE` queries targeting `activity_logs`. This ensures that even if an attacker were to obtain application-level remote code execution or hijack an administrator's web session, they could never alter, truncate, or wipe previous audit records, guaranteeing non-repudiation and forensic evidentiary integrity.
+In an enterprise production deployment, the database user account utilized by the web application should possess strictly **`SELECT` and `INSERT` privileges only** on the `activity_logs` table, with all `UPDATE`, `DELETE`, `DROP`, and `ALTER` grants revoked at the MySQL user permission level (`REVOKE DELETE, UPDATE ON farmers_system_db.activity_logs FROM 'farmers_app'@'localhost'`). In our application codebase, there are zero `UPDATE` or `DELETE` queries targeting `activity_logs`. This ensures that even if an attacker were to obtain application-level remote code execution or hijack an administrator's web session, they could never alter, truncate, or wipe previous audit records, guaranteeing non-repudiation and forensic evidentiary integrity.
 
 ---
 
 ### Decision 8: Scheduling the Monitoring Script (Windows Task Scheduler vs. Cron) (Section 14.2)
-To automate the execution of `scripts/monitor.php` every 15 minutes in a production environment: on Windows Server environments, this is implemented via **Windows Task Scheduler** by creating a scheduled task that triggers every 15 minutes, invoking the action Program/script: `C:\xampp\php\php.exe` with arguments: `C:\xampp\htdocs\clinic_appoinment_system\scripts\monitor.php`. On Linux or POSIX environments, this is accomplished by adding a cron entry via `crontab -e`: `*/15 * * * * /usr/bin/php /var/www/html/clinic_appoinment_system/scripts/monitor.php > /dev/null 2>&1`. During live evaluation, the script is run directly from the command line to demonstrate real-time console log detection and database flag recording.
+To automate the execution of `scripts/monitor.php` every 15 minutes in a production environment: on Windows Server environments, this is implemented via **Windows Task Scheduler** by creating a scheduled task that triggers every 15 minutes, invoking the action Program/script: `C:\xampp\php\php.exe` with arguments: `C:\xampp\htdocs\farmers_system\scripts\monitor.php`. On Linux or POSIX environments, this is accomplished by adding a cron entry via `crontab -e`: `*/15 * * * * /usr/bin/php /var/www/html/farmers_system/scripts/monitor.php > /dev/null 2>&1`. During live evaluation, the script is run directly from the command line to demonstrate real-time console log detection and database flag recording.
 
 ---
 
@@ -52,4 +52,4 @@ A JavaScript file delivered to a web client **cannot** truly be hidden from a de
 ---
 
 ### Decision 10: Difference Between Hashing and Encryption (Protection 13 Note)
-**Hashing is a one-way mathematical function**: it transforms variable-length input data into a fixed-length cryptographic digest that cannot be reversed or decrypted back into the original plaintext. Hashing is the correct cryptographic primitive for passwords, security answers, and OTPs because the system only ever needs to verify equality (i.e., whether the hash of the provided input matches the stored hash). In contrast, **encryption is a two-way mathematical transformation** governed by a secret cryptographic key: plaintext is converted into ciphertext and can be decrypted back into its original form using the authorized key. Encryption (specifically AES-256-CBC with random IV) is the correct primitive for sensitive patient contact numbers because legitimate clinic healthcare personnel and the patient must be able to read and utilize the original phone number to communicate and confirm medical appointments.
+**Hashing is a one-way mathematical function**: it transforms variable-length input data into a fixed-length cryptographic digest that cannot be reversed or decrypted back into the original plaintext. Hashing is the correct cryptographic primitive for passwords, security answers, and OTPs because the system only ever needs to verify equality (i.e., whether the hash of the provided input matches the stored hash). In contrast, **encryption is a two-way mathematical transformation** governed by a secret cryptographic key: plaintext is converted into ciphertext and can be decrypted back into its original form using the authorized key. Encryption (specifically AES-256-CBC with random IV) is the correct primitive for sensitive farmer contact mobile numbers because legitimate agricultural administrative officers and the farmer must be able to read and utilize the original phone number to coordinate subsidy delivery and farm advisory communications.

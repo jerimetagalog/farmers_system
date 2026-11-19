@@ -3,6 +3,8 @@
  * Automated System Self-Test Runner
  * IT 107 - Information Assurance and Security 1
  * Verifies all 20 items from Section 18 Self-Test Checklist
+ * System: Secure Farmers Registration, Assistance and Monitoring System
+ * Student ID: 2020-1050
  */
 
 require_once dirname(__DIR__) . '/php/db.php';
@@ -15,8 +17,8 @@ $pdo = get_db_connection();
 
 echo "=================================================================\n";
 echo "IT 107 IAS 1 Final Project: System Security Self-Test Suite\n";
-echo "System: Secure Clinic Appointment and Monitoring System\n";
-echo "Configuration: Section 2.3 Universal Security Settings\n";
+echo "System: Secure Farmers Registration, Assistance and Monitoring System\n";
+echo "Student ID: 2020-1050 | Configuration: Section 2.3 Universal Settings\n";
 echo "=================================================================\n\n";
 
 $passCount = 0;
@@ -36,14 +38,14 @@ function assert_test(string $testName, bool $condition, string $detail = ''): vo
 }
 
 // TEST 1: Database Encryption & Hashing at rest (Protection 1, 13)
-$uStmt = $pdo->query("SELECT * FROM `users` WHERE `username` = 'patient_juan'");
+$uStmt = $pdo->query("SELECT * FROM `users` WHERE `username` = 'farmer_juan'");
 $juan = $uStmt->fetch();
 $isPwdHashed = password_get_info($juan['password_hash'])['algo'] !== 0;
-$isContactEncrypted = ($juan['contact_number_encrypted'] !== '09876543210' && strlen($juan['contact_number_encrypted']) > 20);
+$isContactEncrypted = ($juan['contact_number_encrypted'] !== '09171234567' && strlen($juan['contact_number_encrypted']) > 20);
 $decryptedContact = decrypt_sensitive_field($juan['contact_number_encrypted']);
 
 assert_test("1. Database encryption & hashing at rest",
-    $isPwdHashed && $isContactEncrypted && ($decryptedContact === '09876543210'),
+    $isPwdHashed && $isContactEncrypted && ($decryptedContact === '09171234567'),
     "Password hashed: YES | Contact encrypted: YES | AES-256 decrypted: {$decryptedContact}"
 );
 
@@ -93,8 +95,8 @@ assert_test("4. Core Registration Error Messages match Handout Section 4.10 verb
 );
 
 // TEST 5: Password History Reuse Prevention (Protection 7)
-$pwdReused = is_password_in_history('2023-0101', 'JuanPassword123!');
-$pwdNew = is_password_in_history('2023-0101', 'BrandNewPassword2026!');
+$pwdReused = is_password_in_history('2020-1051', 'Farmer@2026!');
+$pwdNew = is_password_in_history('2020-1051', 'BrandNewPassword2026!');
 assert_test("5. Password history refusal (last 3 passwords)",
     $pwdReused && !$pwdNew,
     "Current password correctly blocked from reuse; new password allowed."

@@ -1,20 +1,20 @@
 -- ========================================================
 -- IT 107 - Information Assurance and Security 1
--- Final Laboratory Project: Secure Clinic Appointment and Monitoring System
--- Database Schema: clinic_appointment_db
--- Seed: D1 = 9, D2 = 1
+-- Final Laboratory Project: Secure Farmers Registration, Assistance and Monitoring System
+-- Database Schema: farmers_system_db
+-- Student ID: 2020-1050
 -- ========================================================
 
-CREATE DATABASE IF NOT EXISTS `clinic_appointment_db`
+CREATE DATABASE IF NOT EXISTS `farmers_system_db`
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE `clinic_appointment_db`;
+USE `farmers_system_db`;
 
 -- 1. USERS TABLE
--- Stores patient & administrative identity and authentication attributes.
+-- Stores farmer & agricultural administrative identity and authentication attributes.
 -- Contact number encrypted at rest with AES-256 (Protection 13).
 CREATE TABLE IF NOT EXISTS `users` (
-    `id_number` VARCHAR(9) NOT NULL, -- Format: xxxx-xxxx (Primary Key)
+    `id_number` VARCHAR(9) NOT NULL, -- Format: xxxx-xxxx (Primary Key, e.g. 2020-1050)
     `first_name` VARCHAR(50) NOT NULL, -- Universal limit: max 50 chars (Section 2.3)
     `middle_name` VARCHAR(50) NULL,
     `family_name` VARCHAR(50) NOT NULL,
@@ -31,13 +31,13 @@ CREATE TABLE IF NOT EXISTS `users` (
     `username` VARCHAR(20) NOT NULL, -- Universal limits: 6 to 20 chars (Section 2.3)
     `password_hash` VARCHAR(255) NOT NULL, -- Never stored plaintext (Protection 1, S1)
     `contact_number_encrypted` TEXT NOT NULL, -- Sensitive field encrypted with AES-256 (Protection 13)
-    `patient_type` VARCHAR(25) NOT NULL, -- New Patient / Returning Patient
-    `preferred_department` VARCHAR(50) NOT NULL, -- Configured Clinic Departments
+    `farmer_type` VARCHAR(35) NOT NULL, -- Smallholder Farmer / Tenant Farmer / Commercial Farmer / Agricultural Worker
+    `primary_crop` VARCHAR(50) NOT NULL, -- Rice / Corn / Coconut / Banana / Vegetables / High-Value Crops
     `emergency_contact_encrypted` TEXT NULL, -- Optional (AES-256 encrypted if provided)
-    `role` ENUM('patient', 'admin') NOT NULL DEFAULT 'patient',
+    `role` ENUM('farmer', 'admin') NOT NULL DEFAULT 'farmer',
     `is_verified` TINYINT(1) NOT NULL DEFAULT 0, -- 0 = Pending OTP, 1 = Verified
     `failed_logins` INT NOT NULL DEFAULT 0, -- Consecutive failed login attempts
-    `lockout_tier` INT NOT NULL DEFAULT 0, -- 0 = None, 1 = Tier 1 (24s), 2 = Tier 2 (48s), 3 = Tier 3 (96s)
+    `lockout_tier` INT NOT NULL DEFAULT 0, -- 0 = None, 1 = Tier 1 (15s), 2 = Tier 2 (30s), 3 = Tier 3 (60s)
     `locked_until` DATETIME NULL, -- Enforced on server
     `privacy_consent_at` DATETIME NOT NULL, -- Timestamp of RA 10173 consent
     `created_at` DATETIME NOT NULL,
@@ -48,12 +48,11 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 2. AUTHENTICATION ANSWERS TABLE
--- Stores hashed answers to assigned security questions (Q2, Q5, Q7)
--- Normalized to lowercase and trimmed before hashing (Section 5)
+-- Stores hashed answers to 3 chosen security questions from Section 5 bank
 CREATE TABLE IF NOT EXISTS `authentication_answers` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` VARCHAR(9) NOT NULL,
-    `question_key` VARCHAR(10) NOT NULL, -- 'Q2', 'Q5', 'Q7'
+    `question_key` VARCHAR(10) NOT NULL, -- 'Q1' to 'Q8'
     `answer_hash` VARCHAR(255) NOT NULL,
     `created_at` DATETIME NOT NULL,
     UNIQUE KEY `idx_user_question` (`user_id`, `question_key`),
@@ -63,7 +62,6 @@ CREATE TABLE IF NOT EXISTS `authentication_answers` (
 
 -- 3. OTPS TABLE
 -- 6-digit one-time codes generated with random_int(), stored hashed.
--- Seed expiry: 4 minutes (3 + (1 mod 3)). Max 3 attempts before cancellation.
 CREATE TABLE IF NOT EXISTS `otps` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` VARCHAR(9) NOT NULL,
@@ -90,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `password_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 5. IP BLOCKS TABLE
--- Blocks IP after 9 failures within 10 minutes (Seed limit: 8 + D2 = 9)
+-- Blocks IP after 10 failures within 10 minutes (Section 2.3)
 CREATE TABLE IF NOT EXISTS `ip_blocks` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `ip_address` VARCHAR(45) NOT NULL,
@@ -103,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `ip_blocks` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 6. ACTIVITY LOGS TABLE
--- Read-only, append-only security log for all authentication events (Section 13.4)
+-- Read-only, append-only security log for all authentication events (Section 13.4, Protection S11)
 CREATE TABLE IF NOT EXISTS `activity_logs` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `event_type` VARCHAR(50) NOT NULL,
@@ -122,7 +120,7 @@ CREATE TABLE IF NOT EXISTS `activity_logs` (
 -- Findings recorded by CLI monitoring script (Section 14)
 CREATE TABLE IF NOT EXISTS `security_flags` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `pattern_type` VARCHAR(50) NOT NULL, -- 'IP over threshold', 'Account targeted', 'OTP guessing', 'Off-hours log-in'
+    `pattern_type` VARCHAR(50) NOT NULL,
     `severity` ENUM('LOW', 'MED', 'HIGH') NOT NULL DEFAULT 'MED',
     `target` VARCHAR(100) NOT NULL,
     `details` TEXT NOT NULL,
@@ -131,22 +129,22 @@ CREATE TABLE IF NOT EXISTS `security_flags` (
     UNIQUE KEY `idx_flag_unique_daily` (`pattern_type`, `target`, `flagged_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 8. APPOINTMENTS TABLE
--- Clinic appointment booking, scheduling, and status tracking
-CREATE TABLE IF NOT EXISTS `appointments` (
+-- 8. ASSISTANCE REQUESTS TABLE (System-Specific Domain)
+-- Agricultural assistance, seed distribution, subsidy, and soil advisory request tracking
+CREATE TABLE IF NOT EXISTS `assistance_requests` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `patient_id` VARCHAR(9) NOT NULL,
-    `department` VARCHAR(50) NOT NULL,
-    `appointment_date` DATE NOT NULL,
-    `appointment_time` TIME NOT NULL,
-    `reason` TEXT NOT NULL,
-    `status` ENUM('Pending', 'Confirmed', 'Completed', 'Cancelled') NOT NULL DEFAULT 'Pending',
-    `admin_notes` TEXT NULL,
+    `farmer_id` VARCHAR(9) NOT NULL,
+    `program_category` VARCHAR(50) NOT NULL, -- Fertilizer & Seed Subsidy, Crop Insurance & Protection, Farm Equipment Loan, Soil & Agronomy Advisory, Irrigation Support
+    `preferred_date` DATE NOT NULL,
+    `farm_location` VARCHAR(100) NOT NULL,
+    `request_details` TEXT NOT NULL,
+    `status` ENUM('Pending', 'Approved', 'Dispatched', 'Rejected') NOT NULL DEFAULT 'Pending',
+    `officer_notes` TEXT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
-    INDEX `idx_appts_patient` (`patient_id`),
-    INDEX `idx_appts_status` (`status`),
-    INDEX `idx_appts_date` (`appointment_date`),
-    CONSTRAINT `fk_appts_patient` FOREIGN KEY (`patient_id`)
+    INDEX `idx_requests_farmer` (`farmer_id`),
+    INDEX `idx_requests_status` (`status`),
+    INDEX `idx_requests_date` (`preferred_date`),
+    CONSTRAINT `fk_requests_farmer` FOREIGN KEY (`farmer_id`)
         REFERENCES `users` (`id_number`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

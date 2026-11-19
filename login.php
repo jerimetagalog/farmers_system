@@ -19,7 +19,7 @@ if (isset($_SESSION['user_id'])) {
     if (($_SESSION['user_role'] ?? '') === 'admin') {
         header('Location: admin_dashboard.php');
     } else {
-        header('Location: appointments.php');
+        header('Location: assistance.php');
     }
     exit;
 }
@@ -51,7 +51,7 @@ $typedUsername = trim($_POST['username'] ?? ($_GET['u'] ?? ''));
 
 if ($typedUsername !== '') {
     $pdo = get_db_connection();
-    $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `username` = :u");
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :u LIMIT 1");
     $stmt->execute([':u' => $typedUsername]);
     $user = $stmt->fetch();
     if ($user) {
@@ -59,42 +59,47 @@ if ($typedUsername !== '') {
     }
 }
 
-// Process POST Submission
+// 3. Handle Login Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Check if IP is blocked
-    if ($ipStatus['is_blocked']) {
-        $errorMessage = "Access blocked from this IP. Please wait {$ipStatus['seconds_remaining']} seconds.";
+    // CSRF Check
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $errorMessage = 'Session security token invalid or expired. Please reload.';
     }
-    // Check CSRF token (Protection 3)
-    elseif (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        log_activity('CSRF_REJECTED', $typedUsername, null, 'Invalid CSRF token during login.');
-        $errorMessage = 'Security token invalid. Please reload the page.';
+    // Blocked IP Check
+    elseif ($ipStatus['is_blocked']) {
+        $errorMessage = "Your IP address is temporarily blocked. Please wait {$ipStatus['seconds_remaining']} seconds.";
     }
-    // Check CAPTCHA (Section 7)
+    // Account Lockout Check
+    elseif ($lockoutState['is_locked']) {
+        $errorMessage = "This account is temporarily locked. Please wait {$lockoutState['seconds_remaining']} seconds.";
+    }
+    // CAPTCHA Verification
     elseif (!verify_captcha($_POST['captcha_code'] ?? '')) {
-        log_activity('CAPTCHA_FAILED', $typedUsername, null, 'Login CAPTCHA verification failed.');
-        $errorMessage = 'Incorrect CAPTCHA answer. Please try again.';
-    }
-    else {
+        log_activity('CAPTCHA_FAILED', $typedUsername, null, 'Login CAPTCHA failed.');
+        $errorMessage = 'Incorrect security verification code. Please try again.';
+    } else {
         $password = $_POST['password'] ?? '';
 
-        // Query user with prepared statement (Protection 1)
         $pdo = get_db_connection();
-        $stmt = $pdo->prepare("SELECT * FROM `users` WHERE `username` = :u");
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :u LIMIT 1");
         $stmt->execute([':u' => $typedUsername]);
         $user = $stmt->fetch();
 
         if ($user) {
+            // Re-verify lockout under fresh database state
             $lockoutState = check_account_lockout($user);
 
-            // Handout 8.3: Server-enforced lockout check
             if ($lockoutState['is_locked']) {
-                $errorMessage = "Account temporarily locked. Please wait {$lockoutState['seconds_remaining']} seconds before trying again.";
+                $errorMessage = "This account is temporarily locked. Please wait {$lockoutState['seconds_remaining']} seconds.";
             } elseif (password_verify($password, $user['password_hash'])) {
-                // Check if account is verified
-                if ((int)$user['is_verified'] !== 1) {
-                    // Send registration OTP again
-                    create_otp_for_user($user['id_number'], $user['email'], $user['first_name'] . ' ' . $user['family_name'], 'register');
+                // Password is correct: Reset failures
+                reset_account_failures($user['id_number']);
+
+                // If user is not yet email-verified, re-issue registration OTP
+                if (!$user['is_verified']) {
+                    $fullName = $user['first_name'] . ' ' . $user['family_name'];
+                    create_otp_for_user($user['id_number'], $user['email'], $fullName, 'register');
+
                     $_SESSION['pending_otp_user_id'] = $user['id_number'];
                     $_SESSION['pending_otp_purpose'] = 'register';
                     $_SESSION['pending_otp_email'] = $user['email'];
@@ -139,89 +144,308 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div class="card" style="max-width: 480px; margin: 30px auto;">
-    <h1 class="card-title" style="text-align: center; font-size: 24px;">Clinic Portal Sign-in</h1>
-    <p class="card-subtitle" style="text-align: center;">Two-step authentication: Password followed by OTP</p>
+<style>
+/* Modern Split-Layout Login Styling */
+.login-split-card {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    background: #ffffff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 18px 45px rgba(50, 30, 10, 0.16);
+    overflow: hidden;
+    max-width: 980px;
+    margin: 28px auto 40px auto;
+}
 
-    <?php if ($infoMessage): ?>
-        <div class="alert alert-success">&#10003; <?= e($infoMessage) ?></div>
-    <?php endif; ?>
+@media (max-width: 860px) {
+    .login-split-card {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+    }
+    .login-info-side {
+        display: none !important;
+    }
+}
 
-    <?php if ($errorMessage): ?>
-        <div class="alert alert-danger">&#9888; <?= e($errorMessage) ?></div>
-    <?php endif; ?>
+.login-info-side {
+    background: linear-gradient(165deg, rgba(30, 15, 5, 0.93) 0%, rgba(20, 10, 3, 0.96) 60%, rgba(10, 5, 1, 0.98) 100%),
+                url('img/hero-farm-bg.svg') center center / cover no-repeat;
+    color: #ffffff;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-    <!-- Progressive Lockout Countdown Box (Handout 8.3) -->
-    <?php if ($lockoutState['is_locked']): ?>
-        <div id="lockout-box" class="lockout-box">
-            <p><strong>&#128274; Account Temporarily Locked (Tier <?= (int)$lockoutState['lockout_tier'] ?>)</strong></p>
-            <p class="field-hint">Too many failed sign-in attempts. You must wait before trying again:</p>
-            <div id="lockout-countdown" class="lockout-timer"><?= (int)$lockoutState['seconds_remaining'] ?></div>
-            <p class="field-hint">seconds remaining</p>
-        </div>
-    <?php endif; ?>
+.login-info-side::after {
+    display: none;
+}
 
-    <form method="POST" action="login.php" id="login-form">
-        <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+.login-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #d97706;
+    border: 1px solid #f59e0b;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    width: fit-content;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
 
-        <div class="form-group">
-            <label for="username" class="form-label">Username<span class="required-star">*</span></label>
-            <input type="text" id="username" name="username" class="form-control"
-                   maxlength="17" value="<?= e($typedUsername) ?>" placeholder="Your username" required
-                   <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
-        </div>
+.login-form-side {
+    padding: 46px 42px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-        <div class="form-group">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label for="password" class="form-label" style="margin-bottom: 0;">Password<span class="required-star">*</span></label>
-                <!-- Handout Section 8.2: Show Password toggle -->
-                <button type="button" id="toggle-pwd-btn" class="btn btn-secondary btn-sm"
-                        style="padding: 2px 8px; font-size: 11px;"
-                        onclick="let p=document.getElementById('password'); if(p.type==='password'){p.type='text'; this.textContent='Hide';}else{p.type='password'; this.textContent='Show';}">
-                    Show
-                </button>
+.login-feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    color: #e5e7eb;
+    line-height: 1.5;
+}
+
+.login-feature-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: #d97706;
+    border: 1px solid #f59e0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.pwd-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.pwd-wrapper input {
+    padding-right: 74px;
+}
+
+.pwd-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #ece5dc;
+    border: 1px solid #c9bdae;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pwd-toggle-btn:hover {
+    background: #ded3c5;
+    color: #000000;
+}
+
+.captcha-display-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #faf7f2;
+    border: 1.5px solid #cbbfb0;
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    margin-bottom: 10px;
+}
+
+.captcha-img-styled {
+    height: 44px;
+    border-radius: 6px;
+    border: 1px solid #d6cbbe;
+    background: #ffffff;
+}
+
+.captcha-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    background: #ffffff;
+    border: 1.5px solid #cbbfb0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.captcha-refresh-btn:hover {
+    background: #f1ede6;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+</style>
+
+<div class="login-split-card">
+    <!-- Left Visual / Security Feature Side -->
+    <div class="login-info-side">
+        <div>
+            <div class="login-badge-pill">
+                <span>&#127806;</span> Department of Agriculture Region XIII
             </div>
-            <input type="password" id="password" name="password" class="form-control"
-                   placeholder="Your password" required
-                   <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
-        </div>
-
-        <!-- Handout Section 7: CAPTCHA on Login Form -->
-        <div class="form-group">
-            <label for="captcha_code" class="form-label">Security Verification (CAPTCHA)<span class="required-star">*</span></label>
-            <div class="captcha-row">
-                <img src="php/captcha_image.php?t=<?= time() ?>" id="login-captcha-img" class="captcha-img" alt="CAPTCHA">
-                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('login-captcha-img').src='php/captcha_image.php?t='+new Date().getTime()">
-                    &#8634; Refresh
-                </button>
-                <input type="text" id="captcha_code" name="captcha_code" class="form-control" style="max-width: 140px;"
-                       placeholder="Code" maxlength="6" required <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
-            </div>
-        </div>
-
-        <div style="margin-top: 24px;">
-            <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; padding: 12px;"
-                    <?= ($lockoutState['is_locked'] || $ipStatus['is_blocked']) ? 'disabled' : '' ?>>
-                Proceed to Two-Step Verification &#8594;
-            </button>
-        </div>
-    </form>
-
-    <!-- Handout Section 8.2: Show Forgot Password Link after 3 failed attempts -->
-    <div style="margin-top: 24px; text-align: center; border-top: 1px solid var(--border); padding-top: 16px; font-size: 13.5px;">
-        <?php if ($lockoutState['show_forgot_password']): ?>
-            <p style="margin-bottom: 10px;">
-                <a href="forgot_password.php?u=<?= urlencode($typedUsername) ?>" style="color: var(--danger); font-weight: bold;">
-                    Forgot Password? Reset Here
-                </a>
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; color: #ffffff; margin: 18px 0 10px 0; line-height: 1.25; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                Caraga Farmers &amp; Producers Portal
+            </h2>
+            <p style="color: #f3f4f6; font-size: 14px; line-height: 1.6; margin-bottom: 28px; text-shadow: 0 1px 3px rgba(0,0,0,0.4);">
+                Secure authenticated access for subsidy disbursements, farm equipment loans, crop insurance verification, and agronomy advisory services.
             </p>
+
+            <div class="login-feature-item">
+                <div class="login-feature-icon">&#128272;</div>
+                <div>
+                    <strong style="color: #ffffff; font-size: 14px;">Field-Level AES-256 Protection</strong><br>
+                    <span style="color: #e5e7eb;">Mobile records and farmer data are sealed with hardware-accelerated encryption.</span>
+                </div>
+            </div>
+
+            <div class="login-feature-item">
+                <div class="login-feature-icon">&#128273;</div>
+                <div>
+                    <strong style="color: #ffffff; font-size: 14px;">Out-of-Band 2-Step OTP</strong><br>
+                    <span style="color: #e5e7eb;">Time-bound single-use verification token sent directly to your registered email.</span>
+                </div>
+            </div>
+
+            <div class="login-feature-item" style="margin-bottom: 0;">
+                <div class="login-feature-icon">&#128737;</div>
+                <div>
+                    <strong style="color: #ffffff; font-size: 14px;">Progressive Lockout Defense</strong><br>
+                    <span style="color: #e5e7eb;">Tiered rate limiting and automated IP monitors shield against unauthorized intrusions.</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 18px; margin-top: 24px; font-size: 12px; color: #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+            <span>Caraga State University &middot; IT 107 IAS 1</span>
+            <span style="font-weight: 800; color: #fef08a;">ID: 2020-1050</span>
+        </div>
+    </div>
+
+    <!-- Right Login Form Side -->
+    <div class="login-form-side">
+        <div style="margin-bottom: 22px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span style="font-size: 20px;">&#128274;</span>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; color: var(--primary-dark); margin: 0;">
+                    Portal Sign-in
+                </h1>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                Two-step authentication: Enter your password followed by email OTP.
+            </p>
+        </div>
+
+        <?php if ($infoMessage): ?>
+            <div class="alert alert-success">&#10003; <?= e($infoMessage) ?></div>
         <?php endif; ?>
 
-        <!-- Handout 8.3: Register link is disabled while locked -->
-        <p>
-            Don't have an account?
-            <a href="register.php" id="register-link" style="color: var(--primary); font-weight: 600;">Please register here</a>
-        </p>
+        <?php if ($errorMessage): ?>
+            <div class="alert alert-danger">&#9888; <?= e($errorMessage) ?></div>
+        <?php endif; ?>
+
+        <!-- Progressive Lockout Countdown Box (Handout 8.3) -->
+        <?php if ($lockoutState['is_locked']): ?>
+            <div id="lockout-box" class="lockout-box" style="margin-bottom: 20px;">
+                <p><strong>&#128274; Account Temporarily Locked (Tier <?= (int)$lockoutState['lockout_tier'] ?>)</strong></p>
+                <p class="field-hint">Too many failed sign-in attempts. You must wait before trying again:</p>
+                <div id="lockout-countdown" class="lockout-timer"><?= (int)$lockoutState['seconds_remaining'] ?></div>
+                <p class="field-hint">seconds remaining</p>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST" action="login.php" id="login-form">
+            <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+
+            <div class="form-group">
+                <label for="username" class="form-label">Username<span class="required-star">*</span></label>
+                <input type="text" id="username" name="username" class="form-control"
+                       maxlength="17" value="<?= e($typedUsername) ?>" placeholder="Your username" required
+                       <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password<span class="required-star">*</span></label>
+                <div class="pwd-wrapper">
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="Your password" required
+                           <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
+                    <button type="button" id="toggle-pwd-btn" class="pwd-toggle-btn"
+                            onclick="let p=document.getElementById('password'); if(p.type==='password'){p.type='text'; this.textContent='Hide';}else{p.type='password'; this.textContent='Show';}">
+                        Show
+                    </button>
+                </div>
+            </div>
+
+            <!-- CAPTCHA Two-Row Layout -->
+            <div class="form-group">
+                <label for="captcha_code" class="form-label">Security Verification (CAPTCHA)<span class="required-star">*</span></label>
+                <!-- Row 1: Image & Refresh Button -->
+                <div class="captcha-display-box">
+                    <img src="php/captcha_image.php?t=<?= time() ?>" id="login-captcha-img" class="captcha-img-styled" alt="CAPTCHA">
+                    <button type="button" class="captcha-refresh-btn" onclick="document.getElementById('login-captcha-img').src='php/captcha_image.php?t='+new Date().getTime()">
+                        <span>&#8634;</span> Refresh Code
+                    </button>
+                </div>
+                <!-- Row 2: Full-width Input Field -->
+                <input type="text" id="captcha_code" name="captcha_code" class="form-control"
+                       placeholder="Enter the security code shown above" maxlength="6" required <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
+                <span class="field-hint">Case-insensitive. Single-use bot protection.</span>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 14.5px;"
+                        <?= ($lockoutState['is_locked'] || $ipStatus['is_blocked']) ? 'disabled' : '' ?>>
+                    Proceed to Two-Step Verification &#8594;
+                </button>
+            </div>
+        </form>
+
+        <!-- Forgot Password / Register Links -->
+        <div style="margin-top: 24px; text-align: center; border-top: 1px solid var(--border); padding-top: 18px; font-size: 13px;">
+            <?php if ($lockoutState['show_forgot_password']): ?>
+                <p style="margin-bottom: 10px;">
+                    <a href="forgot_password.php?u=<?= urlencode($typedUsername) ?>" style="color: var(--danger); font-weight: 700;">
+                        Forgot Password? Reset Here
+                    </a>
+                </p>
+            <?php endif; ?>
+
+            <p style="color: var(--text-muted); margin: 0;">
+                Don't have an agricultural account?
+                <a href="register.php" id="register-link" style="color: var(--primary); font-weight: 700; text-decoration: underline;">
+                    Register as Farmer / Producer
+                </a>
+            </p>
+        </div>
     </div>
 </div>
 

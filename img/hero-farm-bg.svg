@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 750" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Sky Gradient -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff8ed" />
+      <stop offset="45%" stop-color="#fef3c7" />
+      <stop offset="75%" stop-color="#fed7aa" />
+      <stop offset="100%" stop-color="#ffedd5" />
+    </linearGradient>
+
+    <!-- Warm Golden Morning Sun -->
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.85" />
+      <stop offset="35%" stop-color="#f59e0b" stop-opacity="0.4" />
+      <stop offset="70%" stop-color="#d97706" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#b45309" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Distant Mountains -->
+    <linearGradient id="mountainsGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a7f3d0" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#6ee7b7" stop-opacity="0.75" />
+    </linearGradient>
+    <linearGradient id="mountainsGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#059669" stop-opacity="0.85" />
+    </linearGradient>
+
+    <!-- Rolling Harvest Rice Terraces & Fields -->
+    <linearGradient id="fieldGradFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <linearGradient id="fieldGradMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+
+    <linearGradient id="fieldGradNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#d97706" />
+      <stop offset="100%" stop-color="#78350f" />
+    </linearGradient>
+
+    <linearGradient id="terraceCurve" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sky Canvas -->
+  <rect width="1600" height="750" fill="url(#skyGrad)" />
+
+  <!-- Morning Sunrise Glow -->
+  <circle cx="800" cy="240" r="320" fill="url(#sunGlow)" />
+  <circle cx="800" cy="240" r="100" fill="#fef08a" opacity="0.9" />
+
+  <!-- Distant Mountain Ridges (Caraga mountain range) -->
+  <path d="M0 380 Q 220 280, 480 320 T 960 290 T 1380 320 T 1600 360 L 1600 750 L 0 750 Z" fill="url(#mountainsGrad1)" />
+  <path d="M0 410 Q 300 340, 620 370 T 1150 330 T 1600 400 L 1600 750 L 0 750 Z" fill="url(#mountainsGrad2)" />
+
+  <!-- Rolling Terraces & Golden Rice Paddies -->
+  <path d="M0 450 C 260 410, 480 470, 780 430 C 1120 390, 1380 460, 1600 420 L 1600 750 L 0 750 Z" fill="url(#fieldGradFar)" />
+
+  <!-- Midground Golden Harvest Terraces -->
+  <path d="M0 490 C 350 450, 680 520, 1050 470 C 1360 430, 1490 510, 1600 480 L 1600 750 L 0 750 Z" fill="url(#fieldGradMid)" opacity="0.95" />
+
+  <!-- Irrigation Water Canal Curve Reflections -->
+  <path d="M0 550 Q 420 530, 850 560 T 1600 520 L 1600 535 Q 1150 580, 850 575 Q 420 545, 0 565 Z" fill="#93c5fd" opacity="0.75" />
+
+  <!-- Foreground Golden Harvest Fields -->
+  <path d="M0 560 C 280 520, 640 590, 1020 540 C 1320 500, 1500 570, 1600 540 L 1600 750 L 0 750 Z" fill="url(#fieldGradNear)" />
+
+  <!-- Decorative stylized stalks of rice & wheat in foreground -->
+  <g opacity="0.35" stroke="#78350f" stroke-width="2" fill="none">
+    <path d="M60 750 Q 80 670, 95 620" />
+    <path d="M95 620 Q 110 610, 120 625" />
+    <path d="M90 640 Q 110 635, 115 650" />
+    <path d="M140 750 Q 155 680, 175 630" />
+    <path d="M175 630 Q 195 620, 200 640" />
+
+    <path d="M1480 750 Q 1460 670, 1445 615" />
+    <path d="M1445 615 Q 1430 605, 1420 620" />
+    <path d="M1540 750 Q 1520 680, 1500 625" />
+  </g>
+</svg>

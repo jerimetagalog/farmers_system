@@ -51,25 +51,25 @@ function send_otp_email(string $recipientEmail, string $recipientName, string $o
         ];
         $purposeText = $titles[$purpose] ?? 'Security Verification Code';
 
-        $mail->Subject = "[Secure Clinic System] {$purposeText}";
+        $mail->Subject = "[Secure Farmers Portal] {$purposeText}";
         $timestamp = date('Y-m-d h:i A') . ' PHT';
 
         $mail->Body = "
         <div style='font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #dcdcdc; border-radius: 8px;'>
-            <h2 style='color: #1a5276; margin-top: 0;'>Secure Clinic Appointment and Monitoring System</h2>
-            <h3 style='color: #2c3e50;'>{$purposeText}</h3>
+            <h2 style='color: #78350f; margin-top: 0;'>Secure Farmers Registration, Assistance and Monitoring System</h2>
+            <h3 style='color: #292524;'>{$purposeText}</h3>
             <p>Hello <strong>" . e($recipientName) . "</strong>,</p>
             <p>Your one-time verification code is:</p>
-            <div style='background-color: #f4f6f9; border: 2px dashed #1a5276; padding: 14px; text-align: center; margin: 18px 0;'>
-                <span style='font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #1a5276;'>{$otpCode}</span>
+            <div style='background-color: #fffbeb; border: 2px dashed #d97706; padding: 14px; text-align: center; margin: 18px 0;'>
+                <span style='font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #78350f;'>{$otpCode}</span>
             </div>
             <p>This code will expire in <strong>{$expiryMinutes} minutes</strong> (at {$timestamp}).</p>
-            <p style='color: #7f8c8d; font-size: 13px;'>If you did not request this code, ignore this email and consider changing your password.</p>
+            <p style='color: #78716c; font-size: 13px;'>If you did not request this code, ignore this email and consider changing your password.</p>
             <hr style='border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;'>
-            <p style='font-size: 11px; color: #95a5a6;'>Caraga State University &middot; IT 107 Final Laboratory Project</p>
+            <p style='font-size: 11px; color: #a8a29e;'>Caraga State University &middot; IT 107 Final Laboratory Project &middot; ID: 2020-1050</p>
         </div>";
 
-        $mail->AltBody = "Secure Clinic Appointment and Monitoring System\n"
+        $mail->AltBody = "Secure Farmers Registration, Assistance and Monitoring System\n"
                        . "{$purposeText}\n\n"
                        . "Your OTP Code: {$otpCode}\n"
                        . "This code expires in {$expiryMinutes} minutes.\n"
@@ -109,9 +109,9 @@ function send_lockout_alert_email(string $recipientEmail, string $recipientName,
                 <tr style='background-color: #fdf2e9;'><td style='padding: 8px; border: 1px solid #eee;'><strong>Browser / User Agent</strong></td><td style='padding: 8px; border: 1px solid #eee;'>" . e($userAgent) . "</td></tr>
             </table>
             <p style='color: #c0392b; font-weight: bold;'>If this was not you, reset your password now.</p>
-            <p>You can initiate account recovery at: <a href='http://localhost/clinic_appoinment_system/forgot_password.php'>Forgot Password / Account Recovery</a></p>
+            <p>You can initiate account recovery at: <a href='http://localhost/farmers_system/forgot_password.php'>Forgot Password / Account Recovery</a></p>
             <hr style='border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;'>
-            <p style='font-size: 11px; color: #95a5a6;'>Secure Clinic Appointment and Monitoring System</p>
+            <p style='font-size: 11px; color: #95a5a6;'>Secure Farmers Registration, Assistance and Monitoring System</p>
         </div>";
 
         $mail->send();
@@ -140,16 +140,16 @@ function send_password_changed_alert_email(string $recipientEmail, string $recip
         <div style='font-family: Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #27ae60; border-radius: 8px;'>
             <h2 style='color: #27ae60; margin-top: 0;'>Your Password Was Successfully Changed</h2>
             <p>Hello <strong>" . e($recipientName) . "</strong>,</p>
-            <p>This confirmation is to notify you that the password for your <strong>Secure Clinic Appointment and Monitoring System</strong> account was successfully updated.</p>
+            <p>This confirmation is to notify you that the password for your <strong>Secure Farmers Registration, Assistance and Monitoring System</strong> account was successfully updated.</p>
             <table style='width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;'>
                 <tr style='background-color: #f4fdf8;'><td style='padding: 8px; border: 1px solid #eee;'><strong>Change Time</strong></td><td style='padding: 8px; border: 1px solid #eee;'>{$phtTime}</td></tr>
                 <tr><td style='padding: 8px; border: 1px solid #eee;'><strong>IP Address</strong></td><td style='padding: 8px; border: 1px solid #eee;'>{$clientIp}</td></tr>
                 <tr style='background-color: #f4fdf8;'><td style='padding: 8px; border: 1px solid #eee;'><strong>Browser / Device</strong></td><td style='padding: 8px; border: 1px solid #eee;'>" . e($userAgent) . "</td></tr>
             </table>
             <p>If you made this change, you can safely disregard this message.</p>
-            <p style='color: #c0392b; font-weight: bold;'>If you did NOT change your password, please contact the clinic administrator immediately.</p>
+            <p style='color: #c0392b; font-weight: bold;'>If you did NOT change your password, please contact the agricultural administrator immediately.</p>
             <hr style='border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;'>
-            <p style='font-size: 11px; color: #95a5a6;'>Secure Clinic Appointment and Monitoring System</p>
+            <p style='font-size: 11px; color: #95a5a6;'>Secure Farmers Registration, Assistance and Monitoring System</p>
         </div>";
 
         $mail->send();

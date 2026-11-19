@@ -1,14 +1,14 @@
 # ERROR MESSAGE MAPPING SPECIFICATION
 **Course:** IT 107 – Information Assurance and Security 1  
-**Project:** Secure Clinic Appointment and Monitoring System  
-**Student:** Efren Castillano (`efren.castillano@csucc.edu.ph`)  
-**Assigned Seed:** $D_1 = 9$, $D_2 = 1$  
+**Project:** Secure Farmers Registration, Assistance and Monitoring System  
+**Student:** Jerime Tagalog (`jerime.tagalog@csucc.edu.ph`)  
+**Security Settings:** Universal Section 2.3 Settings (MinUser:6, MaxUser:20, MinPwd:8, MaxName:50)  
 **Deliverable Category:** Criteria P6 Compliance Document
 
 ---
 
 ## 1. Overview
-This document provides the exhaustive mapping of every validation rule implemented across the **Secure Clinic Appointment and Monitoring System**. In accordance with **Protection S3 (Server-Side Validation)** and **Section 4.10 of the IT 107 Handout**, error messages are designed to be specific and actionable for benign users during registration, while generic and non-revealing during authentication to prevent user enumeration attacks.
+This document provides the exhaustive mapping of every validation rule implemented across the **Secure Farmers Registration, Assistance and Monitoring System**. In accordance with **Protection S3 (Server-Side Validation)** and **Section 4.10 of the IT 107 Handout**, error messages are designed to be specific and actionable for benign users during registration, while generic and non-revealing during authentication to prevent user enumeration attacks.
 
 The system enforces validation on both the client side (`js/validate.js`) for interactive user experience and on the server side (`php/validation.php`) for security. The server independently verifies all constraints regardless of client manipulation.
 
@@ -39,7 +39,7 @@ The system enforces validation on both the client side (`js/validate.js`) for in
 | **Birthdate** | Required check | Cannot be empty | `"Birthdate is required."` |
 | **Birthdate** | Format validity | Must parse as `YYYY-MM-DD` | `"Invalid birthdate format."` |
 | **Birthdate** | No future dates | Date cannot be greater than today | `"Birthdate cannot be in the future."` |
-| **Age** | Minimum age limit | Derived age from birthdate must be $\ge 18$ | `"You must be at least 18 years old to register."` |
+| **Age** | Minimum age limit | Derived age from birthdate must be ≥ 18 | `"You must be at least 18 years old to register."` |
 | **Purok / Street**| Required check | Cannot be empty or whitespace | `"Purok / Street is required."` |
 | **Purok / Street**| Length boundaries | Length between 3 and 50 characters | `"Purok / Street must be between 3 and 50 characters."` |
 | **Purok / Street**| Character whitelist | Alphanumeric, spaces, periods, commas, hashes, hyphens | `"Purok / Street contains invalid characters."` |
@@ -66,20 +66,20 @@ The system enforces validation on both the client side (`js/validate.js`) for in
 | **Password** | Required check | Cannot be empty | `"Password is required."` |
 | **Password** | Universal length | Min 8 characters, max 64 (Section 2.3) | `"Password must be at least 8 characters."` |
 | **Password** | Maximum length | Cannot exceed 64 characters | `"Password cannot exceed 64 characters."` |
-| **Password** | Strength check | Must score $\ge 1$ (Medium or Strong entropy) | `"Password is too weak. Must include a mix of uppercase, lowercase, numbers, or symbols."` |
+| **Password** | Strength check | Must score ≥ 1 (Medium or Strong entropy) | `"Password is too weak. Must include a mix of uppercase, lowercase, numbers, or symbols."` |
 | **Confirm Pwd** | Match check | Must strictly equal `password` | `"Passwords do not match."` |
 | **Security Questions** | Selection check | Must pick 3 different questions from bank | `"Please select three different security questions."` / `"You must select exactly 3 security questions."` |
 | **Security Answers** | Answer format | Length 2-50 characters, letters and spaces only | `"Security answer is required."` / `"Answer must contain letters and spaces only."` |
 
 ---
 
-## 3. Clinic-Specific Field Validation Rules & Error Messages
+## 3. Farmer-Specific Field Validation Rules & Error Messages
 
 | Field Name | Kind & Requirement | Rule Specification | Exact Error Message |
 | :--- | :--- | :--- | :--- |
-| **Contact Number** | Formatted text, Required | Philippine mobile number in format `09XXXXXXXXX` (exactly 11 numeric digits starting with `09`). | `"Enter a valid contact number in the format 09XXXXXXXXX."` |
-| **Patient Type** | Dropdown, Required | Whitelist membership: must strictly equal either `'New Patient'` or `'Returning Patient'`. | `"Select a valid patient type."` |
-| **Clinic Department** | Dropdown, Required | Whitelist membership: must strictly equal one of: `'General Medicine'`, `'Pediatrics'`, `'Dental'`, `'Dermatology'`, `'Cardiology'`. | `"Select a valid clinic department."` |
+| **Contact Number** | Formatted text, Required | Philippine mobile number in format `09XXXXXXXXX` (exactly 11 numeric digits starting with `09`). Stored AES-256 encrypted. | `"Enter a valid contact number in the format 09XXXXXXXXX."` |
+| **Farm Type** | Dropdown, Required | Whitelist membership: must strictly equal one of: `'Rice'`, `'Corn'`, `'Vegetable'`, `'Fruit'`, `'Mixed'`. | `"Select a valid farm type."` |
+| **Support Program** | Dropdown, Required | Whitelist membership: must strictly equal one of: `'Fertilizer Subsidy'`, `'Seed Provision'`, `'Crop Protection'`, `'Equipment Loan'`, `'Soil Advisory'`. | `"Select a valid support program."` |
 | **Emergency Contact** | Formatted text, Optional | If provided, must strictly match Philippine mobile format `09XXXXXXXXX` (11 numeric digits). Allowed to be blank. | `"Enter a valid emergency contact number in the format 09XXXXXXXXX."` |
 
 ---
@@ -90,16 +90,16 @@ The system enforces validation on both the client side (`js/validate.js`) for in
 | :--- | :--- | :--- | :--- |
 | **Login Attempt** | Non-existent username OR wrong password | User enumeration (Attacker determining valid accounts) | `"Invalid username or password."` *(Generic, Section 4.10)* |
 | **Login Attempt** | Account lockout active | Brute-force credential guessing | `"Account is temporarily locked due to multiple failed login attempts. Please try again in X seconds."` |
-| **Login / Any Form** | IP block triggered ($10$ failures within 10 min) | Distributed automated dictionary attacks | `"Access temporarily blocked due to repeated security failures. Please contact the clinic administrator."` |
+| **Login / Any Form** | IP block triggered (10 failures within 10 min) | Distributed automated dictionary attacks | `"Access temporarily blocked due to repeated security failures. Please contact the agricultural administrator."` |
 | **CAPTCHA Check** | Missing or incorrect CAPTCHA code | Automated submission bots / credential stuffers | `"Invalid CAPTCHA code. Please try again."` |
 | **CSRF Validation** | Missing or mismatched CSRF token | Cross-Site Request Forgery | `"Security validation failed. Please refresh the page and try again."` |
 | **OTP Submission** | Incorrect 6-digit OTP code | OTP guessing | `"Invalid verification code. You have X attempt(s) remaining."` |
-| **OTP Submission** | Max attempts ($3$) exceeded | OTP brute-force bypass | `"Maximum verification attempts exceeded. Please request a new code."` |
+| **OTP Submission** | Max attempts (3) exceeded | OTP brute-force bypass | `"Maximum verification attempts exceeded. Please request a new code."` |
 | **OTP Submission** | Code past 5-minute expiry | Replay attacks using stale codes | `"Verification code has expired. Please request a new code."` |
-| **OTP Resend** | Cooldown timer ($60$s) not elapsed | Mail server flooding / SMS spamming | `"Please wait X seconds before requesting another code."` |
+| **OTP Resend** | Cooldown timer (60s) not elapsed | Mail server flooding / SMS spamming | `"Please wait X seconds before requesting another code."` |
 | **Password Reset** | Wrong security question answer | Unauthorized account takeover | `"The security answer provided is incorrect."` |
 | **Change Password** | Password reuse (last 3 passwords) | Stolen credential recycling | `"You cannot reuse any of your last 3 passwords. Please choose a different password."` |
 | **Direct URL Access** | Accessing `change_password.php` without token | Authorization bypass (Protection S5) | Redirect to `login.php` with session warning: `"Unauthorized access attempt."` |
-| **Access Control** | Patient navigating to `admin_dashboard.php` | Privilege escalation / unauthorized data viewing | HTTP 403 Forbidden: `"Access Denied: Administrator privilege required."` |
-| **Session State** | Inactive for $> 15$ minutes | Session hijacking on unattended workstation | Redirect to `login.php?timeout=1`: `"Your session has expired due to 15 minutes of inactivity. Please log in again."` |
+| **Access Control** | Farmer navigating to `admin_dashboard.php` | Privilege escalation / unauthorized data viewing | HTTP 403 Forbidden: `"Access Denied: Administrator privilege required."` |
+| **Session State** | Inactive for > 15 minutes | Session hijacking on unattended workstation | Redirect to `login.php?timeout=1`: `"Your session has expired due to 15 minutes of inactivity. Please log in again."` |
 | **Privacy Consent** | Consent checkbox unselected on registration | RA 10173 consent requirement | `"You must agree to the privacy notice and consent terms to register."` |

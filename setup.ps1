@@ -1,7 +1,9 @@
-# IT 107 IAS 1 Final Project: One-Click Setup & Migration Script
+# IT 107 IAS 1 Final Project: Farmers System Setup & Migration Script
+# Assigned Student ID: 2020-1050
+
 Write-Host "=====================================================================" -ForegroundColor Green
-Write-Host " IT 107 IAS 1: Secure Clinic Appointment and Monitoring System" -ForegroundColor Cyan
-Write-Host " Cross-Machine Setup and Migration Helper" -ForegroundColor White
+Write-Host " IT 107 IAS 1: Secure Farmers Registration, Assistance & Monitoring" -ForegroundColor Yellow
+Write-Host " Assigned Student ID: 2020-1050" -ForegroundColor White
 Write-Host "=====================================================================" -ForegroundColor Green
 Write-Host ""
 
@@ -15,7 +17,7 @@ if (Test-Path "C:\xampp\mysql\bin\mysql.exe") {
 }
 
 if (-not $mysqlPath) {
-    Write-Host "[ERROR] MySQL binary not found. Please install/start XAMPP." -ForegroundColor Red
+    Write-Host "[ERROR] MySQL binary not found. Please verify XAMPP is installed and running." -ForegroundColor Red
     pause
     exit 1
 }
@@ -28,7 +30,7 @@ if (-not (Test-Path "config.php")) {
         Write-Host "      Created 'config.php' from 'config.sample.php'." -ForegroundColor Green
     }
 } else {
-    Write-Host "      'config.php' already exists and is configured." -ForegroundColor Green
+    Write-Host "      'config.php' is active." -ForegroundColor Green
 }
 
 # 3. Logs directory
@@ -41,13 +43,13 @@ if (-not (Test-Path "logs")) {
 }
 
 # 4. Database import
-Write-Host "[3/4] Importing database schema & seed data..." -ForegroundColor Yellow
+Write-Host "[3/4] Importing farmers database schema & seed data..." -ForegroundColor Yellow
 $sqlFile = if (Test-Path "database\full_database_dump.sql") { "database\full_database_dump.sql" } else { "database\schema.sql" }
 
 try {
-    & $mysqlPath -u root -e "CREATE DATABASE IF NOT EXISTS clinic_appointment_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-    Get-Content $sqlFile | & $mysqlPath -u root clinic_appointment_db
-    Write-Host "      Database 'clinic_appointment_db' imported successfully." -ForegroundColor Green
+    & $mysqlPath -u root -e "CREATE DATABASE IF NOT EXISTS farmers_system_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+    Get-Content $sqlFile | & $mysqlPath -u root farmers_system_db
+    Write-Host "      Database 'farmers_system_db' imported successfully." -ForegroundColor Green
 } catch {
     Write-Host "      Error running automated import: $_" -ForegroundColor Red
 }
@@ -58,11 +60,11 @@ $phpPath = if (Test-Path "C:\xampp\php\php.exe") { "C:\xampp\php\php.exe" } else
 if ($phpPath) {
     & $phpPath tests/self_test.php
 } else {
-    Write-Host "      PHP CLI not in standard path; skipped CLI self-test." -ForegroundColor DarkYellow
+    Write-Host "      PHP CLI not detected in standard path." -ForegroundColor DarkYellow
 }
 
 Write-Host ""
 Write-Host "=====================================================================" -ForegroundColor Green
 Write-Host "SETUP COMPLETE! Open in your browser:" -ForegroundColor Cyan
-Write-Host "http://localhost/clinic_appoinment_system" -ForegroundColor White
+Write-Host "http://localhost/farmers_system" -ForegroundColor White
 Write-Host "=====================================================================" -ForegroundColor Green

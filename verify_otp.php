@@ -46,7 +46,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'resend_otp') {
                 if (create_otp_for_user($pendingUserId, $user['email'], $fullName, $pendingPurpose)) {
                     $successMessage = 'A new 6-digit verification code has been dispatched to your email.';
                 } else {
-                    $errorMessage = 'Failed to deliver verification email. Please contact clinic support.';
+                    $errorMessage = 'Failed to deliver verification email. Please contact agricultural support.';
                 }
             }
         }
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     if ($user['role'] === 'admin') {
                         header('Location: admin_dashboard.php');
                     } else {
-                        header('Location: appointments.php');
+                        header('Location: assistance.php');
                     }
                     exit;
 

@@ -324,18 +324,18 @@ function validate_contact_number(?string $val, bool $isRequired = true): ?string
     return null;
 }
 
-function validate_patient_type(?string $val): ?string {
-    $allowed = ['New Patient', 'Returning Patient'];
+function validate_farmer_type(?string $val): ?string {
+    $allowed = ['Smallholder Farmer', 'Tenant Farmer', 'Commercial Farmer', 'Agricultural Worker'];
     if (!in_array($val, $allowed, true)) {
-        return "Select a valid patient type.";
+        return "Select a valid farmer type.";
     }
     return null;
 }
 
-function validate_clinic_department(?string $val): ?string {
-    $allowed = ['General Medicine', 'Pediatrics', 'Dental', 'Dermatology', 'Cardiology'];
+function validate_primary_crop(?string $val): ?string {
+    $allowed = ['Rice', 'Corn', 'Coconut', 'Banana', 'Vegetables', 'High-Value Crops'];
     if (!in_array($val, $allowed, true)) {
-        return "Select a valid clinic department.";
+        return "Select a valid primary crop category.";
     }
     return null;
 }

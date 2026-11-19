@@ -1,6 +1,7 @@
 # =======================================================
 # IT 107 - Information Assurance and Security 1
-# Project: Secure Clinic Appointment and Monitoring System
+# Project: Secure Farmers Registration, Assistance and Monitoring System
+# Student: Jerime Tagalog | 2020-1050
 # .gitignore - Secret & Dependency Protection (Protection 11)
 # =======================================================
 
@@ -38,4 +39,7 @@ temp/
 scratch/
 ~$*
 *.tmp
+
+# Email test script (contains live SMTP test logic, not for production)
+test_mail.php
 
