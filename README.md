@@ -111,6 +111,7 @@ farmers_system/
     ├── DEVELOPMENT_JOURNAL.md    # 4-week development journal (Appendix C format)
     ├── SYSTEM_USER_GUIDE.md      # Master step-by-step user and live defense guide
     ├── TRANSFER_AND_DEPLOYMENT_GUIDE.md # Machine-to-machine transfer instructions
+    ├── TEST_MAIL_GUIDE.md         # SMTP configuration & email testing guide (test_mail.php)
     └── SYSTEM_USER_GUIDE.docx    # Microsoft Word version of user guide
 ```
 
