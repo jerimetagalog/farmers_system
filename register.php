@@ -108,47 +108,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($err) $errors['name_extension'] = $err;
     }
 
-    $err = validate_birthdate_and_age($values['birthdate'], $values['age']);
-    if ($err) $errors['birthdate'] = $err;
+    $birthCheck = validate_birthdate($values['birthdate']);
+    if ($birthCheck['error']) {
+        $errors['birthdate'] = $birthCheck['error'];
+    }
+    $calculatedAge = $birthCheck['age'];
 
     // 5. Validate Address Fields (Section 4.7)
-    $err = validate_address_field($values['purok_street'], 'Purok / Street', true, 50);
+    $err = validate_address_purok($values['purok_street']);
     if ($err) $errors['purok_street'] = $err;
 
-    $err = validate_address_field($values['barangay'], 'Barangay', true, 50);
+    $err = validate_address_text($values['barangay'], 'Barangay');
     if ($err) $errors['barangay'] = $err;
 
-    $err = validate_address_field($values['municipality_city'], 'Municipality / City', true, 50);
+    $err = validate_address_text($values['municipality_city'], 'Municipality / City');
     if ($err) $errors['municipality_city'] = $err;
 
-    $err = validate_address_field($values['province'], 'Province', true, 50);
+    $err = validate_address_text($values['province'], 'Province');
     if ($err) $errors['province'] = $err;
 
-    $err = validate_address_field($values['country'], 'Country', true, 50);
+    $err = validate_address_text($values['country'], 'Country');
     if ($err) $errors['country'] = $err;
 
     $err = validate_zip_code($values['zip_code']);
     if ($err) $errors['zip_code'] = $err;
 
     // 6. Contact Number & Farmer Info
-    $err = validate_contact_number($values['contact_number']);
+    $err = validate_contact_number($values['contact_number'], true);
     if ($err) $errors['contact_number'] = $err;
 
     if ($values['emergency_contact'] !== '') {
-        $err = validate_contact_number($values['emergency_contact']);
+        $err = validate_contact_number($values['emergency_contact'], false);
         if ($err) $errors['emergency_contact'] = $err;
     }
 
     $err = validate_email($values['email']);
     if ($err) $errors['email'] = $err;
 
-    if (empty($values['farmer_type'])) {
-        $errors['farmer_type'] = 'Please select a farmer classification.';
-    }
+    $err = validate_farmer_type($values['farmer_type']);
+    if ($err) $errors['farmer_type'] = $err;
 
-    if (empty($values['primary_crop'])) {
-        $errors['primary_crop'] = 'Please select a primary agricultural crop.';
-    }
+    $err = validate_primary_crop($values['primary_crop']);
+    if ($err) $errors['primary_crop'] = $err;
 
     // 7. Username & Password Validation
     $err = validate_username($values['username']);
@@ -156,20 +157,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
-    $err = validate_password_complexity($password);
+    $err = validate_password($password, $confirmPassword);
     if ($err) $errors['password'] = $err;
 
-    if ($password !== $confirmPassword) {
-        $errors['confirm_password'] = 'Passwords do not match.';
-    }
-
     // 8. Security Questions Validation (Section 5)
-    $err = validate_security_question_set(
-        $values['sel_q1'], $values['ans_1'] !== '' ? $values['ans_1'] : $values['ans_q2'],
-        $values['sel_q2'], $values['ans_2'] !== '' ? $values['ans_2'] : $values['ans_q5'],
-        $values['sel_q3'], $values['ans_3'] !== '' ? $values['ans_3'] : $values['ans_q7']
-    );
-    if ($err) $errors['security_questions'] = $err;
+    if ($values['ans_1'] === '' && $values['ans_q2'] !== '') $values['ans_1'] = $values['ans_q2'];
+    if ($values['ans_2'] === '' && $values['ans_q5'] !== '') $values['ans_2'] = $values['ans_q5'];
+    if ($values['ans_3'] === '' && $values['ans_q7'] !== '') $values['ans_3'] = $values['ans_q7'];
+
+    $chosenKeys = [$values['sel_q1'], $values['sel_q2'], $values['sel_q3']];
+    $answersArr = [$values['ans_1'], $values['ans_2'], $values['ans_3']];
+    $qErrors = validate_chosen_security_questions($chosenKeys, $answersArr);
+    if (!empty($qErrors)) {
+        $errors['security_questions'] = implode('<br>', $qErrors);
+    }
 
     // 9. Privacy Consent Validation (Section 4.3)
     if (empty($values['privacy_consent'])) {
@@ -210,8 +211,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
             // Protection 13: AES-256 field-level encryption for contact numbers
-            $contactEncrypted = encrypt_field($values['contact_number']);
-            $emergencyEncrypted = !empty($values['emergency_contact']) ? encrypt_field($values['emergency_contact']) : null;
+            $contactEncrypted = encrypt_sensitive_field($values['contact_number']);
+            $emergencyEncrypted = !empty($values['emergency_contact']) ? encrypt_sensitive_field($values['emergency_contact']) : null;
 
             // Compute server-calculated age
             $bdateObj = new DateTime($values['birthdate']);
