@@ -148,20 +148,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 /* Modern Split-Layout Login Styling */
 .login-split-card {
     display: grid;
-    grid-template-columns: 1.05fr 1fr;
+    grid-template-columns: 1.1fr 1fr;
     background: #ffffff;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-lg);
-    box-shadow: 0 18px 45px rgba(50, 30, 10, 0.16);
+    box-shadow: 0 24px 60px rgba(50, 25, 5, 0.18), 0 4px 16px rgba(0,0,0,0.06);
     overflow: hidden;
-    max-width: 980px;
-    margin: 28px auto 40px auto;
+    max-width: 1040px;
+    margin: 32px auto 48px auto;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 @media (max-width: 860px) {
     .login-split-card {
         grid-template-columns: 1fr;
-        max-width: 480px;
+        max-width: 500px;
     }
     .login-info-side {
         display: none !important;
@@ -169,26 +170,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 .login-info-side {
-    background: linear-gradient(165deg, rgba(30, 15, 5, 0.93) 0%, rgba(20, 10, 3, 0.96) 60%, rgba(10, 5, 1, 0.98) 100%),
-                url('img/hero-farm-bg.svg') center center / cover no-repeat;
+    background: linear-gradient(160deg, rgba(20, 10, 4, 0.90) 0%, rgba(35, 18, 6, 0.88) 50%, rgba(12, 6, 2, 0.95) 100%),
+                url('img/farmer-ricefield.jpg') center center / cover no-repeat;
     color: #ffffff;
-    padding: 48px 40px;
+    padding: 48px 42px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.login-info-side::after {
-    display: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .login-badge-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #d97706;
+    background: linear-gradient(135deg, #d97706, #b45309);
     border: 1px solid #f59e0b;
     color: #ffffff;
     font-size: 11px;
@@ -198,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     letter-spacing: 0.6px;
     text-transform: uppercase;
     width: fit-content;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.45);
 }
 
 .login-form-side {
@@ -213,25 +210,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     display: flex;
     align-items: flex-start;
     gap: 14px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     font-size: 13.5px;
     color: #e5e7eb;
     line-height: 1.5;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.login-feature-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateX(4px);
 }
 
 .login-feature-icon {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
-    background: #d97706;
-    border: 1px solid #f59e0b;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: 1px solid #fbbf24;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 17px;
     flex-shrink: 0;
     color: #ffffff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    box-shadow: 0 3px 10px rgba(217, 119, 6, 0.35);
+}
+
+.login-quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.quick-chip {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #f1ede6;
+    border: 1px solid #ded3c5;
+    color: var(--primary-dark);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: default;
 }
 
 .pwd-wrapper {
@@ -269,25 +298,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #faf7f2;
+    background: linear-gradient(to right, #faf7f2, #f5efe6);
     border: 1.5px solid #cbbfb0;
     border-radius: var(--radius-md);
-    padding: 8px 12px;
+    padding: 10px 14px;
     margin-bottom: 10px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
 }
 
 .captcha-img-styled {
-    height: 44px;
+    height: 46px;
     border-radius: 6px;
-    border: 1px solid #d6cbbe;
+    border: 1.5px solid #cbbfb0;
     background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .captcha-refresh-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 14px;
+    padding: 8px 16px;
     font-size: 12px;
     font-weight: 700;
     color: var(--primary-dark);
@@ -296,12 +327,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
 }
 
 .captcha-refresh-btn:hover {
     background: #f1ede6;
     border-color: var(--primary);
     color: var(--primary);
+    transform: rotate(-2deg);
 }
 </style>
 
@@ -312,41 +345,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="login-badge-pill">
                 <span>&#127806;</span> Department of Agriculture Region XIII
             </div>
-            <h2 style="font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; color: #ffffff; margin: 18px 0 10px 0; line-height: 1.25; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 29px; font-weight: 800; color: #ffffff; margin: 18px 0 10px 0; line-height: 1.25; text-shadow: 0 2px 6px rgba(0,0,0,0.6);">
                 Caraga Farmers &amp; Producers Portal
             </h2>
-            <p style="color: #f3f4f6; font-size: 14px; line-height: 1.6; margin-bottom: 28px; text-shadow: 0 1px 3px rgba(0,0,0,0.4);">
-                Secure authenticated access for subsidy disbursements, farm equipment loans, crop insurance verification, and agronomy advisory services.
+            <p style="color: #f3f4f6; font-size: 13.5px; line-height: 1.6; margin-bottom: 24px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">
+                Secure authenticated access for municipal subsidy disbursements, seed vouchers, fertilizer assistance, farm equipment loans, and agronomy advisory services.
             </p>
 
             <div class="login-feature-item">
                 <div class="login-feature-icon">&#128272;</div>
                 <div>
-                    <strong style="color: #ffffff; font-size: 14px;">Field-Level AES-256 Protection</strong><br>
-                    <span style="color: #e5e7eb;">Mobile records and farmer data are sealed with hardware-accelerated encryption.</span>
+                    <strong style="color: #ffffff; font-size: 13.5px;">Field-Level AES-256-CBC Protection</strong><br>
+                    <span style="color: #e5e7eb; font-size: 12.5px;">Sensitive mobile contact numbers are sealed at rest with unique cryptographic IVs.</span>
                 </div>
             </div>
 
             <div class="login-feature-item">
                 <div class="login-feature-icon">&#128273;</div>
                 <div>
-                    <strong style="color: #ffffff; font-size: 14px;">Out-of-Band 2-Step OTP</strong><br>
-                    <span style="color: #e5e7eb;">Time-bound single-use verification token sent directly to your registered email.</span>
+                    <strong style="color: #ffffff; font-size: 13.5px;">Out-of-Band 2-Step OTP Authentication</strong><br>
+                    <span style="color: #e5e7eb; font-size: 12.5px;">A 6-digit verification code is generated via CSPRNG and dispatched directly to your verified email.</span>
+                </div>
+            </div>
+
+            <div class="login-feature-item">
+                <div class="login-feature-icon">&#128737;</div>
+                <div>
+                    <strong style="color: #ffffff; font-size: 13.5px;">Progressive Lockout &amp; IP Protection</strong><br>
+                    <span style="color: #e5e7eb; font-size: 12.5px;">Tiered rate limiting (15s, 30s, 60s) and automated IP blocking defend against credential stuffing.</span>
                 </div>
             </div>
 
             <div class="login-feature-item" style="margin-bottom: 0;">
-                <div class="login-feature-icon">&#128737;</div>
+                <div class="login-feature-icon">&#128220;</div>
                 <div>
-                    <strong style="color: #ffffff; font-size: 14px;">Progressive Lockout Defense</strong><br>
-                    <span style="color: #e5e7eb;">Tiered rate limiting and automated IP monitors shield against unauthorized intrusions.</span>
+                    <strong style="color: #ffffff; font-size: 13.5px;">Immutable Audit Trails (RA 10173)</strong><br>
+                    <span style="color: #e5e7eb; font-size: 12.5px;">Every login event, failure, and security anomaly is permanently recorded without edit or delete rights.</span>
                 </div>
             </div>
         </div>
 
-        <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 18px; margin-top: 24px; font-size: 12px; color: #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+        <div style="border-top: 1px solid rgba(255, 255, 255, 0.18); padding-top: 18px; margin-top: 24px; font-size: 12px; color: #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
             <span>Caraga State University &middot; IT 107 IAS 1</span>
-            <span style="font-weight: 800; color: #fef08a;">ID: 2020-1050</span>
+            <span style="font-weight: 800; color: #fef08a; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 4px;">ID: 2020-1050</span>
         </div>
     </div>
 
@@ -354,14 +395,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="login-form-side">
         <div style="margin-bottom: 22px;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                <span style="font-size: 20px;">&#128274;</span>
-                <h1 style="font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 800; color: var(--primary-dark); margin: 0;">
+                <span style="font-size: 22px;">&#128274;</span>
+                <h1 style="font-family: 'Outfit', sans-serif; font-size: 25px; font-weight: 800; color: var(--primary-dark); margin: 0;">
                     Portal Sign-in
                 </h1>
             </div>
             <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
                 Two-step authentication: Enter your password followed by email OTP.
             </p>
+
+            <!-- Quick Roles Indicator Chips -->
+            <div class="login-quick-chips">
+                <span class="quick-chip">&#128104;&#8205;&#127806; Farmer Portal</span>
+                <span class="quick-chip">&#128737;&#65039; Admin Dashboard</span>
+                <span class="quick-chip">&#128272; RA 10173 Compliant</span>
+            </div>
         </div>
 
         <?php if ($infoMessage): ?>
@@ -388,7 +436,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="username" class="form-label">Username<span class="required-star">*</span></label>
                 <input type="text" id="username" name="username" class="form-control"
-                       maxlength="17" value="<?= e($typedUsername) ?>" placeholder="Your username" required
+                       maxlength="20" value="<?= e($typedUsername) ?>" placeholder="e.g. farmer_juan" required
                        <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
             </div>
 
@@ -396,7 +444,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="password" class="form-label">Password<span class="required-star">*</span></label>
                 <div class="pwd-wrapper">
                     <input type="password" id="password" name="password" class="form-control"
-                           placeholder="Your password" required
+                           placeholder="Enter your account password" required
                            <?= $lockoutState['is_locked'] ? 'readonly' : '' ?>>
                     <button type="button" id="toggle-pwd-btn" class="pwd-toggle-btn"
                             onclick="let p=document.getElementById('password'); if(p.type==='password'){p.type='text'; this.textContent='Hide';}else{p.type='password'; this.textContent='Show';}">
@@ -422,7 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div style="margin-top: 24px;">
-                <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 14.5px;"
+                <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; padding: 13.5px; font-size: 14.5px; font-weight: 800; letter-spacing: 0.3px; box-shadow: 0 4px 14px rgba(194, 94, 0, 0.35);"
                         <?= ($lockoutState['is_locked'] || $ipStatus['is_blocked']) ? 'disabled' : '' ?>>
                     Proceed to Two-Step Verification &#8594;
                 </button>
@@ -434,7 +482,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if ($lockoutState['show_forgot_password']): ?>
                 <p style="margin-bottom: 10px;">
                     <a href="forgot_password.php?u=<?= urlencode($typedUsername) ?>" style="color: var(--danger); font-weight: 700;">
-                        Forgot Password? Reset Here
+                        &#128273; Forgot Password? Reset Here
                     </a>
                 </p>
             <?php endif; ?>
